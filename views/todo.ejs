@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Real time todolist</title>
+    <style>
+        a {
+            text-decoration: none;
+            color: black;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Real time todolist</h1>
+    <ul id="todolist">
+        <% todolist.forEach(function(item, index) { %>
+        <li id='<%= item.id %>'><a href="#" onclick="removeItemRequest('<%= item.id %>');return false;">✘</a><%= item.text %></li>
+        <% }); %>
+    </ul>
+    <p>
+        <label for="newtodo">What should I do ?</label>
+        <input type="text" id="newtodo" autofocus required />
+        <button onclick="requestAddItemTodoList()">addItem</button>
+    </p>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io.connect('http://localhost:8080');
+
+        //add listner to enter keybord event
+        document.getElementById('newtodo').addEventListener('keypress', function(e){
+            if (e.keyCode == 13)
+                requestAddItemTodoList();
+        });
+
+        // send request to remove item
+        function removeItemRequest(itemId) {
+            socket.emit('removeItem', itemId);
+        }
+
+        // get request to remove item
+        socket.on('removeItem', function (itemObject) {
+            document.getElementById(itemObject["id"]).remove();
+        });
+
+        //send request to add item
+        function requestAddItemTodoList() {
+            var newTodo = document.getElementById('newtodo');
+            if (!newTodo || newTodo.value === '')
+                return;
+            socket.emit('addItem', newTodo.value);
+            newTodo.value = '';
+        }
+
+        // get request to add item
+        socket.on('addItem', function (itemObject) {
+            let li = document.createElement('li');
+            li.id=itemObject["id"];
+            let a = document.createElement('a');
+            let text = document.createTextNode(itemObject["text"]);
+            a.text = '✘';
+            a.href = "#";
+            a.onclick = function () {
+                 removeItemRequest("'"+itemObject["id"]+"'");
+                 return false;
+                 };
+            li.appendChild(a);
+            li.appendChild(text);
+            document.getElementById('todolist').appendChild(li);
+        });
+    </script>
+</body>
+
+</html>
