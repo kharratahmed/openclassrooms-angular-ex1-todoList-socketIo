@@ -6,7 +6,7 @@
         "ent": "~0.1.0",
         "express": "^4.17.1",
         "nodemon": "^1.19.1",
-        "socket.io": "~2.0.3"
+        "socket.io": "~2.5.0"
     },
     "author": "K.ahmed <ahmed.kharrat@esprit.tn>",
     "description": "Un gestionnaire de todolist temps reél"
